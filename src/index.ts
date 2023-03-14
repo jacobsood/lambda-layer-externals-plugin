@@ -1,7 +1,7 @@
-import path from "path";
+import { resolve } from "path";
 import { readdirSync, readFileSync, createWriteStream } from "fs";
 import { Compiler, ExternalModule } from "webpack";
-import archiver from "archiver";
+import * as archiver from "archiver";
 
 type Packages = Set<string>;
 
@@ -69,8 +69,8 @@ export class LambdaLayerExternalsPlugin {
       ({ outputOptions }) => {
         const { moduleSource } = this.options;
 
-        const sourceDir = path.resolve(moduleSource);
-        const outputPath = outputOptions.path ?? path.resolve("./dist/");
+        const sourceDir = resolve(moduleSource);
+        const outputPath = outputOptions.path ?? resolve("./dist/");
 
         LambdaLayerExternalsPlugin.writeToZip(
           sourceDir,
