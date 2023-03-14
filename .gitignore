@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+lib/
+coverage/
+reports/
+tmp/
+
+# OS X
+.history
+.DS_Store
+
+# IntelliJ
+.idea_modules
+*.iml
+*.iws
+*.ipr
+.idea/
+*/build/
+out/
