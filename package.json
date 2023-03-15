@@ -1,5 +1,5 @@
 {
-  "name": "lambda-layer-externals-plugin",
+  "name": "webpack-lambda-layer-plugin",
   "version": "1.0.1",
   "description": "Webpack plugin to export used node_modules as a separate package for the lambda layer",
   "main": "lib/index.js",
@@ -7,7 +7,7 @@
   "files": ["lib/**/*"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jacobsood/lambda-layer-externals-plugin.git"
+    "url": "git+https://github.com/jacobsood/webpack-lambda-layer-plugin.git"
   },
   "keywords": [
     "webpack",
@@ -19,9 +19,9 @@
   "author": "Jacob Sood",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jacobsood/lambda-layer-externals-plugin/issues"
+    "url": "https://github.com/jacobsood/webpack-lambda-layer-plugin/issues"
   },
-  "homepage": "https://github.com/jacobsood/lambda-layer-externals-plugin#readme",
+  "homepage": "https://github.com/jacobsood/webpack-lambda-layer-plugin#readme",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib/",
