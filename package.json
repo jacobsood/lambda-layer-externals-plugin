@@ -11,10 +11,10 @@
   },
   "keywords": [
     "webpack",
-    "lambda-layer",
-    "lambda",
-    "aws",
-    "externals"
+    "externals",
+    "aws lambda",
+    "lambda layer",
+    "node modules packaging"
   ],
   "author": "Jacob Sood",
   "license": "MIT",
