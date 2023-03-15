@@ -7,8 +7,8 @@
   <a href="https://www.npmjs.com/package/webpack-lambda-layer-plugin">
     <img alt="npm version" src="https://img.shields.io/npm/v/webpack-lambda-layer-plugin.svg?style=flat-square" />
   </a>
-  <a href="https://libraries.io/npm/lambda-layer-externals-plugin">
-    <img alt="Dependency Status" src="https://img.shields.io/librariesio/release/npm/lambda-layer-externals-plugin?style=flat-square" />
+  <a href="https://libraries.io/npm/webpack-lambda-layer-plugin">
+    <img alt="Dependency Status" src="https://img.shields.io/librariesio/release/npm/webpack-lambda-layer-plugin?style=flat-square" />
   </a>
   <a href="https://twitter.com/acdlite/status/974390255393505280">
     <img alt="Blazing Fast" src="https://img.shields.io/badge/speed-blazing%20%F0%9F%94%A5-brightgreen.svg?style=flat-square">
@@ -24,10 +24,9 @@
   </a>
 </p>
 
-<br />
-Webpack Lambda Layer Plugin is a tool designed to simplify the process of packaging code libraries for your Lambda functions. The plugin works by bundling the necessary node dependencies as a separate package, which can then be utilized in your Lambda Layer, providing an efficient way to share code libraries with multiple Lambda Functions.
+<p>Webpack Lambda Layer Plugin is a tool designed to simplify the process of packaging code libraries for your Lambda functions. The plugin works by bundling the necessary node dependencies as a separate package, which can then be utilized in your Lambda Layer, providing an efficient way to share code libraries with multiple Lambda Functions.</p>
 
-Simultaneously, these dependencies will get externalized from your Lambda Function bundles, leading to reduced bundle sizes and improved build and deployment times.
+<p>Simultaneously, these dependencies will get externalized from your Lambda Function bundles, leading to reduced bundle sizes and improved build and deployment times.</p>
 
 ## Installation
 ***yarn***
