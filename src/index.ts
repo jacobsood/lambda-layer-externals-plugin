@@ -1,9 +1,10 @@
 import { resolve } from "path";
-import { readdirSync, readFileSync, createWriteStream } from "fs";
+import { readFileSync, existsSync, createWriteStream } from "fs";
 import { Compiler, ExternalModule } from "webpack";
 import * as archiver from "archiver";
 
 type Packages = Set<string>;
+type DependenciesMap = Map<string, Set<string>>;
 
 type AllowListItem = {
   packageName: string;
@@ -22,16 +23,15 @@ const IGNORE_PACKAGES_REGEX = /^@aws-sdk[\\/]/;
 
 export class LambdaLayerExternalsPlugin {
   private readonly options: Options;
-  private readonly packages: Packages;
-  private readonly skipPackages: Packages;
+  // private readonly skipPackages: Packages;
+  private readonly dependenciesMap: DependenciesMap;
 
-  private externalizedModules: Packages;
+  private readonly externalizedModules: Packages;
 
   constructor(options?: Options) {
     this.options = LambdaLayerExternalsPlugin.init(options);
-
-    this.skipPackages = this.getSkippablePackages();
-    this.packages = this.getNodePackages();
+    this.dependenciesMap = new Map<string, Set<string>>();
+    // this.skipPackages = this.getSkippablePackages();
 
     this.externalizedModules = new Set<string>();
   }
@@ -53,12 +53,9 @@ export class LambdaLayerExternalsPlugin {
             const type =
               this.options.type ?? compiler.options.output.library?.type;
 
-            if (!this.canExternalizePackage(request)) return callback();
-
-            if (!request.match(IGNORE_PACKAGES_REGEX))
-              this.externalizedModules.add(request);
-
-            return callback(null, new ExternalModule(request, type));
+            return this.externalizePackage(request)
+              ? callback(null, new ExternalModule(request, type))
+              : callback();
           },
         );
       },
@@ -81,53 +78,60 @@ export class LambdaLayerExternalsPlugin {
     );
   }
 
-  private canExternalizePackage(request: string): boolean {
-    // EXTERNALIZE PACKAGES WITH THIS REGEX AT ALL TIMES
+  private externalizePackage(request: string) {
     if (request.match(IGNORE_PACKAGES_REGEX)) return true;
 
-    // EXTERNALIZE ONLY IF REQUEST IS A NODE PACKAGE AND IS NOT IN ALLOWLIST
-    return this.packages.has(request) && !this.skipPackages.has(request);
+    this.updateDependenciesMap(request);
+
+    if (this.dependenciesMap.has(request)) {
+      this.externalizedModules.add(request);
+
+      const dependencies = this.dependenciesMap.get(request);
+      dependencies?.forEach(this.externalizePackage.bind(this));
+
+      return true;
+    }
+
+    return false;
   }
 
-  private getNodePackages(): Packages {
+  private updateDependenciesMap(request: string) {
     const { moduleSource } = this.options;
 
-    return readdirSync(moduleSource, { withFileTypes: true })
-      .filter((module) => module.isDirectory())
-      .reduce((set: Set<string>, module) => {
-        const { name } = module;
+    if (this.dependenciesMap.has(request)) return;
 
-        if (this.skipPackages.has(name)) return set;
-
-        return set.add(name);
-      }, new Set<string>());
+    const packagePath = `${moduleSource}${request}`;
+    if (existsSync(packagePath))
+      this.dependenciesMap.set(request, this.getPackageDependencies(request));
   }
 
-  private getSkippablePackages(): Packages {
-    const { allowList } = this.options;
+  // private getSkippablePackages(): Packages {
+  //   const { allowList } = this.options;
+  //
+  //   return allowList.reduce((set: Packages, allowedItem) => {
+  //     const { packageName, allowSubPackages } = allowedItem;
+  //
+  //     set.add(packageName);
+  //
+  //     if (allowSubPackages ?? true) {
+  //       this.getPackageDependencies(packageName).forEach((subPackage) => {
+  //         set.add(subPackage);
+  //       });
+  //     }
+  //
+  //     return set;
+  //   }, new Set<string>());
+  // }
 
-    return allowList.reduce((set: Set<string>, allowedItem) => {
-      const { packageName, allowSubPackages } = allowedItem;
-
-      set.add(packageName);
-
-      if (allowSubPackages ?? true) {
-        this.getPackageDependencies(packageName).forEach((subPackage) => {
-          set.add(subPackage);
-        });
-      }
-
-      return set;
-    }, new Set<string>());
-  }
-
-  private getPackageDependencies(packageName: string): Array<string> {
+  private getPackageDependencies(packageName: string): Packages {
     const { moduleSource } = this.options;
+    const packagePath = `${moduleSource}${packageName}/package.json`;
+
     const dependencies = JSON.parse(
-      readFileSync(`${moduleSource}${packageName}/package.json`, "utf8"),
-    ).dependencies as Record<string, string>;
+      readFileSync(packagePath, "utf8"),
+    ).dependencies;
 
-    return Object.keys(dependencies);
+    return dependencies ? new Set(Object.keys(dependencies)) : new Set();
   }
 
   private static writeToZip(

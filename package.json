@@ -1,6 +1,6 @@
 {
   "name": "webpack-lambda-layer-plugin",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Webpack plugin to export used node_modules as a separate package for the lambda layer",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
